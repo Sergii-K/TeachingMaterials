@@ -86,7 +86,14 @@ public class MyMap implements Map {
 
     @Override
     public Set keySet() {
-        return null;
+        Set set = new HashSet();
+        for(LinkedList ll: arr){
+            for(Object o: ll){
+                Tuple t = (Tuple) o;
+                set.add(t.key);
+            }
+        }
+        return !set.isEmpty() ? set :null;
     }
 
     @Override
@@ -104,6 +111,7 @@ public class MyMap implements Map {
             }
         }
         if (!contains) list.add(tuple);
+        size++;
         return tuple.value;
     }
 
@@ -117,7 +125,13 @@ public class MyMap implements Map {
 
     @Override
     public Object remove(Object key) {
-        return null;
+        List l = arr[key.hashCode()%10];
+        Object res = null;
+        for (Object o: l){
+            Tuple t = (Tuple) o;
+            if(t.key.equals(key)) { res = o; l.remove(o);}
+        }
+        return res;
     }
 
     @Override
@@ -127,7 +141,14 @@ public class MyMap implements Map {
 
     @Override
     public Collection values() {
-        return null;
+        Collection col = new LinkedList();
+        for(LinkedList ll: arr){
+            for(Object o: ll){
+                Tuple t = (Tuple) o;
+                col.add(t.value);
+            }
+        }
+        return !col.isEmpty() ? col :null;
     }
 
     private class Tuple {
