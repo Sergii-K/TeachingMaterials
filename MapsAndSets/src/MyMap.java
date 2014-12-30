@@ -1,42 +1,87 @@
-import org.apache.http.auth.NTUserPrincipal;
-
 import java.util.*;
 
 /**
  * Created by akravets on 12/30/14.
  */
 public class MyMap implements Map {
-    Object[] arr = new Object[10];
+    LinkedList[] arr = new LinkedList[10];
+    int size = 0;
 
 
     @Override
     public void clear() {
-
+        arr = new LinkedList[10];
+        size = 0;
     }
 
     @Override
     public boolean containsKey(Object key) {
+        for (LinkedList ll : arr) {
+            for (Object o : ll) {
+                Tuple t = (Tuple) o;
+                if (t.key.equals(key)) return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean containsValue(Object value) {
+        for (LinkedList ll : arr) {
+            for (Object o : ll) {
+                Tuple t = (Tuple) o;
+                if (t.value.equals(value)) return true;
+            }
+        }
         return false;
     }
 
     @Override
     public Set<Entry> entrySet() {
-        return null;
+        Set<Entry> es = new HashSet<Entry>();
+        for (LinkedList ll : arr) {
+            for (Object o : ll) {
+                final Tuple t = (Tuple) o;
+                es.add(new Entry() {
+                    @Override
+                    public Object getKey() {
+                        return t.key;
+                    }
+
+                    @Override
+                    public Object getValue() {
+                        return t.value;
+                    }
+
+                    @Override
+                    public Object setValue(Object object) {
+                        return put(t.key, t.value);
+                    }
+                });
+            }
+        }
+        return es;
     }
 
     @Override
     public Object get(Object key) {
-        return arr[key.hashCode() % 10];
+        int pos = key.hashCode();
+        List list = arr[pos];
+        if(list==null) return false;
+        if(list.size()==1){
+            return ((Tuple)list.get(0)).value;
+        } else {
+            for(Object o: list){
+                Tuple t = (Tuple) o;
+                if(t.key.equals(key)) return t.value;
+            }
+        }
+        return null;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size == 0;
     }
 
     @Override
@@ -47,24 +92,24 @@ public class MyMap implements Map {
     @Override
     public Object put(Object key, Object value) {
         int position = key.hashCode() % arr.length;
-        List list = arr[position]==null ? new LinkedList() : (List) arr[position];
+        List list = arr[position] == null ? new LinkedList() : (List) arr[position];
         Tuple tuple = new Tuple(key, value);
-        boolean contains= false;
-        for(int i=0; i<list.size(); i++) {
+        boolean contains = false;
+        for (int i = 0; i < list.size(); i++) {
             Tuple tp = (Tuple) list.get(i);
-            if(tp.key.equals(key)){
+            if (tp.key.equals(key)) {
                 contains = true;
                 list.set(i, tuple);
                 break;
             }
         }
-        if(!contains) list.add(tuple);
+        if (!contains) list.add(tuple);
         return tuple.value;
     }
 
     @Override
     public void putAll(Map map) {
-        for(Object entry: map.entrySet()){
+        for (Object entry : map.entrySet()) {
             Map.Entry e = (Entry) entry;
             this.put(e.getKey(), e.getValue());
         }
@@ -77,7 +122,7 @@ public class MyMap implements Map {
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     @Override
@@ -85,7 +130,7 @@ public class MyMap implements Map {
         return null;
     }
 
-    private class Tuple{
+    private class Tuple {
         Object key;
         Object value;
 
